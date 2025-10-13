@@ -1,0 +1,13 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo "Packaging WordPress folder..."
+      - mkdir -p /tmp/deploy
+      - cp -r . /tmp/deploy/
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: /tmp/deploy
