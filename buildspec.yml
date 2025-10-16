@@ -19,7 +19,7 @@ phases:
       - echo "Preparing artifact..."
       - mkdir -p artifact/wp-content/themes
       
-      # Copy appspec.yml to artifact root (CRITICAL FIX)
+      # Copy appspec.yml to artifact root
       - echo "Copying appspec.yml to artifact..."
       - cp appspec.yml artifact/
       
@@ -27,7 +27,7 @@ phases:
       - echo "Copying scripts to artifact..."
       - cp -r scripts artifact/
       
-      # Copy changed themes
+      # Copy changed themes - FIXED: Proper YAML multi-line syntax
       - |
         for THEME in $CHANGED_THEMES; do
           if [ -d "wp-content/themes/$THEME" ]; then
