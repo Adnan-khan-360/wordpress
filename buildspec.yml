@@ -39,3 +39,4 @@ artifacts:
     - themes/*.zip
     - themes/empty.txt
     - appspec.yml
+    - scripts/**
