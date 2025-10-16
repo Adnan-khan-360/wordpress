@@ -12,7 +12,7 @@ phases:
       - echo "Detecting changed themes..."
       # Skip git diff if repo is shallow or CodeBuild source is not a git repo
       - if [ -d ".git" ]; then CHANGED_THEMES=$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq); else CHANGED_THEMES=$(ls wp-content/themes); fi
-      - echo "Changed themes: $CHANGED_THEMES"
+      - echo Changed themes "$CHANGED_THEMES"
 
   post_build:
     commands:
