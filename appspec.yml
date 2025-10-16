@@ -3,6 +3,7 @@ os: linux
 files:
   - source: themes/
     destination: /var/www/html/wordpress/wp-content/themes/
+    overwrite: yes
 permissions:
   - object: /var/www/html/wordpress/wp-content/themes/*
     owner: www-data
