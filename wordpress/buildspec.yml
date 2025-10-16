@@ -1,17 +1,50 @@
 version: 0.2
 
 phases:
+  pre_build:
+    commands:
+      - echo "========== PRE-BUILD STAGE =========="
+      - echo "Checking environment..."
+      - pwd
+      - ls -la
+      - echo "Ensuring WordPress source exists..."
+      - if [ ! -d "wordpress" ]; then echo "❌ wordpress directory not found"; exit 1; fi
+      - echo "Pre-build checks complete ✅"
+
   install:
     commands:
+      - echo "========== INSTALL STAGE =========="
       - echo "Installing dependencies if any..."
+      - sudo yum update -y || true
+      - sudo yum install -y zip unzip git || true
+      - echo "Dependencies installed ✅"
 
   build:
     commands:
-      - echo "Copying all WordPress themes..."
+      - echo "========== BUILD STAGE =========="
+      - echo "Preparing artifact directory..."
       - mkdir -p artifact/wp-content/themes
-      - cp -r wordpress/wp-content/themes/* artifact/wp-content/themes/ || echo "No themes found to copy"
+      - mkdir -p artifact/wp-content/plugins
+
+      - echo "Copying all WordPress themes..."
+      - if [ -d "wordpress/wp-content/themes" ]; then cp -r wordpress/wp-content/themes/* artifact/wp-content/themes/; else echo "No themes folder found"; fi
+
+      - echo "Copying all WordPress plugins..."
+      - if [ -d "wordpress/wp-content/plugins" ]; then cp -r wordpress/wp-content/plugins/* artifact/wp-content/plugins/; else echo "No plugins folder found"; fi
+
+      - echo "Copying remaining important WordPress files..."
+      - cp -r wordpress/wp-admin wordpress/wp-includes wordpress/index.php wordpress/wp-config.php artifact/ || echo "Copied core files"
+
+  post_build:
+    commands:
+      - echo "========== POST-BUILD STAGE =========="
+      - echo "Build completed successfully ✅"
+      - echo "Preparing artifact for deployment..."
+      - ls -la artifact
+      - echo "Post-build done ✅"
 
 artifacts:
   files:
     - '**/*'
   base-directory: artifact
+  discard-paths: no
