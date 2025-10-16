@@ -2,9 +2,8 @@ version: 0.0
 os: linux
 
 files:
-  # Deploy all files from the artifact
-  - source: /
-    destination: /var/www/html/wordpress
+  - source: wp-content/themes/
+    destination: /var/www/html/wordpress/wp-content/themes/
 
 hooks:
   BeforeInstall:
