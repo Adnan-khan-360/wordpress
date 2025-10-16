@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 
 files:
-  # Only deploy changed themes
+  # Deploy all files from the artifact
   - source: /
     destination: /var/www/html/wordpress
 
