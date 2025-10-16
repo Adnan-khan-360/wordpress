@@ -12,7 +12,7 @@ phases:
   pre_build:
     commands:
       - echo "Checking changed theme files..."
-      - |
+      - >
         if [ -d ".git" ]; then
           CHANGED_THEMES=$(git diff --name-only HEAD~1 HEAD | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
         else
@@ -24,7 +24,7 @@ phases:
     commands:
       - echo "Zipping changed themes..."
       - mkdir -p artifacts/themes
-      - |
+      - >
         if [ -n "$CHANGED_THEMES" ]; then
           for theme in $CHANGED_THEMES; do
             zip -r "artifacts/themes/$theme.zip" "wp-content/themes/$theme"
@@ -36,7 +36,7 @@ phases:
 
   post_build:
     commands:
-      - echo "Build completed on `date`"
+      - echo "Build completed successfully on $(date)"
 
 artifacts:
   files:
