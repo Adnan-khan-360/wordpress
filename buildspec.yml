@@ -8,16 +8,22 @@ phases:
 
   build:
     commands:
-      - echo "Preparing theme changes for deployment..."
-      # Detect changed themes (optional)
+      - echo "Detecting changed themes..."
       - CHANGED_THEMES=$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
-      - echo "Changed themes detected: $CHANGED_THEMES"
+      - echo "Changed themes: $CHANGED_THEMES"
 
   post_build:
     commands:
-      - echo "Deploying theme changes to WordPress..."
-      - for THEME in $CHANGED_THEMES; do
-          echo "Updating theme: $THEME";
-          mkdir -p /tmp/deploy/wp-content/themes/$THEME;
-          rsync -av --ignore-existing wordpress/wp-content/themes/$THEME/ /tmp/deploy/wp-content/themes/$THEME/;
+      - echo "Preparing artifact for changed themes..."
+      - mkdir -p artifact/wp-content/themes
+      - |
+        for THEME in $CHANGED_THEMES; do
+          echo "Packing theme: $THEME"
+          rsync -av wordpress/wp-content/themes/$THEME/ artifact/wp-content/themes/$THEME/
         done
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: artifact
+  discard-paths: no
