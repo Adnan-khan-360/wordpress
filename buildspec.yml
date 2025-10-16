@@ -36,7 +36,7 @@ phases:
 
   post_build:
     commands:
-      - echo "✅ Build finished at $(date)"
+      - echo "Build finished at $(date)"
 
 artifacts:
   files:
