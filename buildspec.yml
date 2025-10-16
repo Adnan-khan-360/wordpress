@@ -10,7 +10,6 @@ phases:
     commands:
       - echo "Detecting changed themes..."
       - CHANGED_THEMES=$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
-      - echo "Changed themes: $CHANGED_THEMES"
 
   post_build:
     commands:
