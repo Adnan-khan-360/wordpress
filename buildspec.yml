@@ -4,12 +4,15 @@ phases:
   install:
     commands:
       - echo "Installing dependencies..."
-      - sudo apt install -y rsync || true
+      - sudo apt-get update
+      - sudo apt-get install -y rsync || true
 
   build:
     commands:
       - echo "Detecting changed themes..."
-      - CHANGED_THEMES=$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
+      # Skip git diff if repo is shallow or CodeBuild source is not a git repo
+      - if [ -d ".git" ]; then CHANGED_THEMES=$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq); else CHANGED_THEMES=$(ls wp-content/themes); fi
+      - echo Changed themes "$CHANGED_THEMES"
 
   post_build:
     commands:
@@ -17,8 +20,10 @@ phases:
       - mkdir -p artifact/wp-content/themes
       - |
         for THEME in $CHANGED_THEMES; do
-          echo "Packing theme: $THEME"
-          rsync -av wordpress/wp-content/themes/$THEME/ artifact/wp-content/themes/$THEME/
+          if [ -d "wp-content/themes/$THEME" ]; then
+            echo "Packing theme: $THEME"
+            rsync -av wp-content/themes/$THEME/ artifact/wp-content/themes/$THEME/
+          fi
         done
 
 artifacts:
