@@ -3,6 +3,7 @@ os: linux
 files:
   - source: themes/
     destination: /var/www/html/wordpress/wp-content/themes/
+    overwrite: yes
 permissions:
   - object: /var/www/html/wordpress/wp-content/themes/*
     owner: www-data
@@ -11,17 +12,17 @@ permissions:
 hooks:
   BeforeInstall:
     - location: scripts/stop_apache.sh
-      timeout: 300
+      timeout: 180
       runas: root
     - location: scripts/backup_themes.sh
-      timeout: 300
+      timeout: 180
       runas: root
   AfterInstall:
     - location: scripts/unzip_themes.sh
-      timeout: 300
+      timeout: 180
       runas: root
   ApplicationStart:
     - location: scripts/restart_apache.sh
-      timeout: 300
+      timeout: 180
       runas: root
 
