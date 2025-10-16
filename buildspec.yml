@@ -2,45 +2,29 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      php: 8.1
     commands:
       - echo "Installing dependencies..."
-      - sudo apt-get update -y
-      - sudo apt-get install -y rsync
+      - apt-get update -y
+      - apt-get install -y rsync zip unzip
+
+  pre_build:
+    commands:
+      - echo "Preparing source code..."
+      - echo "Detecting changed themes..."
+      # Get changed theme folders from Git
+      - if [ -d ".git" ]; then CHANGED_THEMES=$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION HEAD~1 | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq); fi
+      - echo "Changed themes: $CHANGED_THEMES"
 
   build:
     commands:
-      - echo "Detecting changed themes..."
-      - |
-        if [ -d ".git" ]; then
-          CHANGED_THEMES=$(git diff --name-only HEAD~1 HEAD | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
-        else
-          CHANGED_THEMES=$(ls wp-content/themes)
-        fi
-        echo "Changed themes: $CHANGED_THEMES"
-        echo "$CHANGED_THEMES" > changed_themes.txt
-
-  post_build:
-    commands:
-      - echo "Preparing artifact..."
-      - mkdir -p artifact/wp-content/themes
-      - cp appspec.yml artifact/
-      - cp -r scripts artifact/
-      - |
-        if [ -f changed_themes.txt ]; then
-          for THEME in $(cat changed_themes.txt); do
-            if [ -d "wp-content/themes/$THEME" ]; then
-              echo "Packing theme: $THEME"
-              cp -r "wp-content/themes/$THEME" "artifact/wp-content/themes/"
-            fi
-          done
-        else
-          echo "No changed themes detected; copying all themes..."
-          cp -r wp-content/themes/* artifact/wp-content/themes/ || true
-        fi
-      - echo "Artifact contents:"
-      - find artifact -type f | sort
+      - echo "Zipping changed themes..."
+      - for theme in $CHANGED_THEMES; do
+          zip -r "themes/$theme.zip" "wp-content/themes/$theme";
+        done
 
 artifacts:
   files:
-    - '**/*'
-  base-directory: artifact
+    - themes/*.zip
+
