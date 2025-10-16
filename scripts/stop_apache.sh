@@ -1,7 +1,3 @@
 #!/bin/bash
-
-# Stop Apache service before deployment
-systemctl stop apache2
-
-echo "Apache service stopped."
-
+echo "Stopping Apache..."
+sudo systemctl stop apache2 || true

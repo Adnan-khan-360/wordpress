@@ -1,18 +1,45 @@
-build:
-  commands:
-    - mkdir -p themes
-    - |
-      if [ -n "$CHANGED_THEMES" ]; then
-        for theme in $CHANGED_THEMES; do
-          zip -r "themes/$theme.zip" "wp-content/themes/$theme"
-        done
-      else
-        echo "No themes changed. Creating placeholder."
-        touch themes/empty.txt
-      fi
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      php: 8.1
+    commands:
+      - echo "Installing dependencies..."
+      - sudo apt-get update -y
+      - sudo apt-get install -y zip unzip rsync
+
+  pre_build:
+    commands:
+      - echo "Checking changed theme files..."
+      - |
+        if [ -d ".git" ]; then
+          CHANGED_THEMES=$(git diff --name-only HEAD~1 HEAD | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
+        else
+          CHANGED_THEMES=""
+        fi
+      - echo "Changed themes: $CHANGED_THEMES"
+
+  build:
+    commands:
+      - echo "Zipping changed themes..."
+      - mkdir -p artifacts/themes
+      - |
+        if [ -n "$CHANGED_THEMES" ]; then
+          for theme in $CHANGED_THEMES; do
+            zip -r "artifacts/themes/$theme.zip" "wp-content/themes/$theme"
+          done
+        else
+          echo "No theme changes detected."
+          zip -r artifacts/themes/all-themes.zip wp-content/themes/*
+        fi
+
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+
 artifacts:
   files:
     - appspec.yml
-    - scripts/**
-    - themes/*.zip
-    - themes/empty.txt
+    - scripts/**/*
+    - artifacts/**/*

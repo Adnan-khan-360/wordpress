@@ -1,28 +1,22 @@
 version: 0.0
 os: linux
 files:
-  - source: /
+  - source: artifacts/themes/
     destination: /var/www/html/wordpress/wp-content/themes/
     overwrite: yes
-permissions:
-  - object: /var/www/html/wordpress/wp-content/themes/*
-    owner: www-data
-    group: www-data
-    mode: 755
+
 hooks:
   BeforeInstall:
     - location: scripts/stop_apache.sh
-      timeout: 180
-      runas: root
-    - location: scripts/backup_themes.sh
-      timeout: 180
-      runas: root
-  AfterInstall:
-    - location: scripts/unzip_themes.sh
-      timeout: 180
-      runas: root
-  ApplicationStart:
-    - location: scripts/restart_apache.sh
-      timeout: 180
+      timeout: 60
       runas: root
 
+  AfterInstall:
+    - location: scripts/permissions.sh
+      timeout: 60
+      runas: root
+
+  ApplicationStart:
+    - location: scripts/restart_apache.sh
+      timeout: 60
+      runas: root
