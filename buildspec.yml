@@ -12,22 +12,14 @@ phases:
   pre_build:
     commands:
       - echo "Checking changed theme files..."
-      - "if [ -d \".git\" ]; then CHANGED_THEMES=$(git diff --name-only HEAD~1 HEAD | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq); else CHANGED_THEMES=\"\"; fi"
-      - echo "Changed themes: $CHANGED_THEMES"
+      - 'if [ -d ".git" ]; then CHANGED_THEMES=$(git diff --name-only HEAD~1 HEAD | grep "wp-content/themes/" | cut -d"/" -f4 | sort | uniq); else CHANGED_THEMES=""; fi'
+      - echo "$CHANGED_THEMES"
 
   build:
     commands:
       - echo "Packaging themes..."
       - mkdir -p artifacts/themes
-      - |
-        if [ -n "$CHANGED_THEMES" ]; then
-          for theme in $CHANGED_THEMES; do
-            zip -r "artifacts/themes/$theme.zip" "wp-content/themes/$theme"
-          done
-        else
-          echo "No theme changes detected, zipping all themes"
-          zip -r artifacts/themes/all-themes.zip wp-content/themes/*
-        fi
+      - 'if [ -n "$CHANGED_THEMES" ]; then for theme in $CHANGED_THEMES; do zip -r "artifacts/themes/$theme.zip" "wp-content/themes/$theme"; done; else echo "No theme changes detected, zipping all themes"; zip -r artifacts/themes/all-themes.zip wp-content/themes/*; fi'
 
   post_build:
     commands:
