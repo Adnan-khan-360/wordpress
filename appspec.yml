@@ -4,16 +4,7 @@ os: linux
 files:
   - source: /
     destination: /var/www/html/wordpress
-    overwrite: true
-
-permissions:
-  - object: /var/www/html/wordpress
-    owner: www-data
-    group: www-data
-    mode: 755
-    type:
-      - directory
-      - file
+    overwrite: false   # Don't overwrite other files (plugins, uploads)
 
 hooks:
   BeforeInstall:

@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies..."
+      - sudo apt install -y rsync || true
+
+  build:
+    commands:
+      - echo "Preparing theme changes for deployment..."
+      # Detect changed themes (optional)
+      - CHANGED_THEMES=$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
+      - echo "Changed themes detected: $CHANGED_THEMES"
+
+  post_build:
+    commands:
+      - echo "Deploying theme changes to WordPress..."
+      - for THEME in $CHANGED_THEMES; do
+          echo "Updating theme: $THEME";
+          mkdir -p /tmp/deploy/wp-content/themes/$THEME;
+          rsync -av --ignore-existing wordpress/wp-content/themes/$THEME/ /tmp/deploy/wp-content/themes/$THEME/;
+        done
