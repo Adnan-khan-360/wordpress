@@ -12,12 +12,7 @@ phases:
   pre_build:
     commands:
       - echo "Checking changed theme files..."
-      - |
-        if [ -d ".git" ]; then
-          CHANGED_THEMES=$(git diff --name-only HEAD~1 HEAD | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
-        else
-          CHANGED_THEMES=""
-        fi
+      - "if [ -d \".git\" ]; then CHANGED_THEMES=$(git diff --name-only HEAD~1 HEAD | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq); else CHANGED_THEMES=\"\"; fi"
       - echo "Changed themes: $CHANGED_THEMES"
 
   build:
