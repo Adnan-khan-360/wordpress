@@ -14,18 +14,27 @@ phases:
         echo "Detecting changed themes..."
         if [ -d ".git" ]; then
           CHANGED_THEMES=$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION HEAD~1 | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
+        else
+          CHANGED_THEMES=""
         fi
         echo "Changed themes: $CHANGED_THEMES"
 
   build:
     commands:
-      - echo "Zipping changed themes..."
+      - echo "Creating themes folder..."
       - mkdir -p themes
       - |
-        for theme in $CHANGED_THEMES; do
-          zip -r "themes/$theme.zip" "wp-content/themes/$theme"
-        done
+        if [ -n "$CHANGED_THEMES" ]; then
+          for theme in $CHANGED_THEMES; do
+            echo "Zipping theme: $theme"
+            zip -r "themes/$theme.zip" "wp-content/themes/$theme"
+          done
+        else
+          echo "No themes changed. Creating empty placeholder."
+          touch themes/empty.txt
+        fi
 
 artifacts:
   files:
     - themes/*.zip
+    - themes/empty.txt
