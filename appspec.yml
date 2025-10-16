@@ -3,8 +3,8 @@ os: linux
 
 files:
   # Only deploy changed themes
-  - source: wp-content/themes/
-    destination: /var/www/html/wordpress/wp-content/themes/
+  - source: /
+    destination: /var/www/html/wordpress
 
 hooks:
   BeforeInstall:
