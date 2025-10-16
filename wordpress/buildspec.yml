@@ -9,7 +9,7 @@ phases:
     commands:
       - echo "Copying all WordPress themes..."
       - mkdir -p artifact/wp-content/themes
-      - cp -r wp-content/themes/* artifact/wp-content/themes/
+      - cp -r wordpress/wp-content/themes/* artifact/wp-content/themes/ || echo "No themes found to copy"
 
 artifacts:
   files:
