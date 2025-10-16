@@ -1,13 +1,20 @@
 version: 0.2
 
 phases:
+  install:
+    commands:
+      - echo "Installing dependencies if any..."
   build:
     commands:
-      - echo "Packaging WordPress folder..."
-      - mkdir -p /tmp/deploy
-      - cp -r . /tmp/deploy/
+      - echo "Detecting changed theme folders..."
+      # Get changed files in wp-content/themes and extract theme names
+      - CHANGED_THEMES=$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION | grep 'wp-content/themes/' | cut -d'/' -f4 | sort | uniq)
+      - echo "Themes changed: $CHANGED_THEMES"
+      - mkdir -p artifact
+      # Copy only changed theme folders
+      - for THEME in $CHANGED_THEMES; do cp -r wp-content/themes/$THEME artifact/$THEME; done
 
 artifacts:
   files:
     - '**/*'
-  base-directory: /tmp/deploy
+  base-directory: artifact
