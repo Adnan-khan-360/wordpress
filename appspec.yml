@@ -1,8 +1,15 @@
 version: 0.0
 os: linux
 files:
-  - source: build_output/themes.zip
-    destination: /tmp/deploy
+  - source: wp-content/themes
+    destination: /var/www/html/wp-content/themes
+
+permissions:
+  - object: /var/www/html/wp-content/themes
+    pattern: "**"
+    owner: www-data
+    group: www-data
+    mode: 755
 
 hooks:
   BeforeInstall:
@@ -17,10 +24,5 @@ hooks:
 
   ApplicationStart:
     - location: scripts/restart_apache.sh
-      timeout: 60
-      runas: 
-      
-  ApplicationStop:
-    - location: scripts/stop_apache.sh
       timeout: 60
       runas: root
