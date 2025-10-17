@@ -1,38 +1,17 @@
 version: 0.2
 
-env:
-  variables:
-    THEMES_PATH: "wp-content/themes"
-
 phases:
   install:
     commands:
       - echo "Installing dependencies..."
       - apt install -y zip
 
-  pre_build:
-    commands:
-      - echo "Preparing to build WordPress themes..."
-      - cd $THEMES_PATH
-      - for d in */ ; do
-          echo "Checking theme $d...";
-          if [ -f "$d/package.json" ]; then
-            cd "$d" && npm install && npm run build && cd ..;
-          fi
-        done
-
   build:
     commands:
-      - echo "Zipping themes folder..."
-      - cd ../..
-      - zip -r themes.zip $THEMES_PATH
-
-  post_build:
-    commands:
-      - echo "Build completed successfully on `date`"
-      - mkdir -p build_output
-      - mv themes.zip build_output/
+      - echo "Zipping only theme folder and deployment scripts..."
+      - zip -r wordpress-deploy.zip appspec.yml scripts wp-content/themes
 
 artifacts:
   files:
-    - build_output/themes.zip
+    - wordpress-deploy.zip
+    - scripts/**
