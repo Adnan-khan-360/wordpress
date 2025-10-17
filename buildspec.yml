@@ -1,11 +1,23 @@
 version: 0.2
 
 phases:
+  install:
+    commands:
+      - echo "Installing dependencies..."
+      - apt install -y zip
+
   build:
     commands:
-      - echo "Creating simple test deployment..."
-      - zip deployment.zip appspec.yml
+      - echo "Creating direct deployment package..."
+      - echo "Current directory structure:"
+      - ls -la
+      - echo "Creating zip with proper structure..."
+      - zip -r deployment.zip appspec.yml scripts/ wp-content/themes/
+      - echo "Zip contents:"
+      - unzip -l deployment.zip
 
 artifacts:
   files:
     - deployment.zip
+  discard-paths: yes
+  
