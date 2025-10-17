@@ -1,22 +1,26 @@
 version: 0.0
 os: linux
 files:
-  - source: artifacts/themes/
-    destination: /var/www/html/wordpress/wp-content/themes/
-    overwrite: yes
+  - source: build_output/themes.zip
+    destination: /tmp/deploy
 
 hooks:
   BeforeInstall:
-    - location: scripts/stop_apache.sh
+    - location: scripts/backup_themes.sh
       timeout: 60
       runas: root
 
   AfterInstall:
-    - location: scripts/permissions.sh
-      timeout: 60
+    - location: scripts/deploy_themes.sh
+      timeout: 120
       runas: root
 
   ApplicationStart:
     - location: scripts/restart_apache.sh
+      timeout: 60
+      runas: 
+      
+  ApplicationStop:
+    - location: scripts/stop_apache.sh
       timeout: 60
       runas: root

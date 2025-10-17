@@ -1,31 +1,38 @@
 version: 0.2
 
+env:
+  variables:
+    THEMES_PATH: "wp-content/themes"
+
 phases:
   install:
-    runtime-versions:
-      php: 8.1
     commands:
       - echo "Installing dependencies..."
-      - apt-get update -y
-      - apt-get install -y zip unzip rsync git
+      - yum install -y zip
 
   pre_build:
     commands:
-      - echo "Checking changed theme files..."
-      - 'if [ -d ".git" ]; then CHANGED_THEMES=$(git diff --name-only HEAD~1 HEAD | grep "wp-content/themes/" | cut -d"/" -f4 | sort | uniq); else CHANGED_THEMES=""; fi'
+      - echo "Preparing to build WordPress themes..."
+      - cd $THEMES_PATH
+      - for d in */ ; do
+          echo "Checking theme $d...";
+          if [ -f "$d/package.json" ]; then
+            cd "$d" && npm install && npm run build && cd ..;
+          fi
+        done
 
   build:
     commands:
-      - echo "Packaging themes..."
-      - mkdir -p artifacts/themes
-      - 'if [ -n "$CHANGED_THEMES" ]; then for theme in $CHANGED_THEMES; do zip -r "artifacts/themes/$theme.zip" "wp-content/themes/$theme"; done; else echo "No theme changes detected, zipping all themes"; zip -r artifacts/themes/all-themes.zip wp-content/themes/*; fi'
+      - echo "Zipping themes folder..."
+      - cd ../..
+      - zip -r themes.zip $THEMES_PATH
 
   post_build:
     commands:
-      - echo "✅ Build finished at $(date)"
+      - echo "Build completed successfully on `date`"
+      - mkdir -p build_output
+      - mv themes.zip build_output/
 
 artifacts:
   files:
-    - appspec.yml
-    - scripts/**/*
-    - artifacts/**/*
+    - build_output/themes.zip
