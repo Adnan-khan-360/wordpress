@@ -8,16 +8,16 @@ phases:
 
   build:
     commands:
-      - echo "Creating direct deployment package..."
-      - echo "Current directory structure:"
+      - echo "Creating deployment package..."
+      - echo "Files to include:"
       - ls -la
-      - echo "Creating zip with proper structure..."
       - zip -r deployment.zip appspec.yml scripts/ wp-content/themes/
-      - echo "Zip contents:"
+      - echo "Verifying zip contents:"
       - unzip -l deployment.zip
 
 artifacts:
   files:
-    - deployment.zip
-  discard-paths: yes
-  
+    - appspec.yml
+    - scripts/**/*
+    - wp-content/themes/**/*
+  discard-paths: no
