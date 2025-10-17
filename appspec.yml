@@ -1,17 +1,23 @@
 version: 0.0
 os: linux
 files:
-  - source: /
-    destination: /var/www/html/wordpress
+  - source: wp-content/themes/
+    destination: /var/www/html/wordpress/wp-content/themes/
 
 permissions:
-  - object: /var/www/html/wordpress
-    pattern: "**"
+  - object: /var/www/html/wordpress/wp-content/themes
     owner: www-data
     group: www-data
     mode: 755
+    type:
+      - directory
 
 hooks:
+  ApplicationStop:
+    - location: scripts/stop_apache.sh
+      timeout: 60
+      runas: root
+
   BeforeInstall:
     - location: scripts/backup_themes.sh
       timeout: 60
