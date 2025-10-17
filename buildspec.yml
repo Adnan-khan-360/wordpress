@@ -8,7 +8,7 @@ phases:
   install:
     commands:
       - echo "Installing dependencies..."
-      - yum install -y zip
+      - apt install -y zip
 
   pre_build:
     commands:
