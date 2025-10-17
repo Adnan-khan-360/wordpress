@@ -2,10 +2,10 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/html/wp-content/themes
+    destination: /var/www/html/wordpress
 
 permissions:
-  - object: /var/www/html/wp-content/themes
+  - object: /var/www/html/wordpress
     pattern: "**"
     owner: www-data
     group: www-data
