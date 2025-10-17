@@ -1,28 +1,6 @@
 version: 0.0
 os: linux
-files:
-  - source: wp-content/themes
-    destination: /var/www/html/wp-content/themes
-
-permissions:
-  - object: /var/www/html/wp-content/themes
-    pattern: "**"
-    owner: www-data
-    group: www-data
-    mode: 755
-
 hooks:
-  BeforeInstall:
-    - location: scripts/backup_themes.sh
-      timeout: 60
-      runas: root
-
   AfterInstall:
-    - location: scripts/deploy_themes.sh
-      timeout: 120
-      runas: root
-
-  ApplicationStart:
-    - location: scripts/restart_apache.sh
-      timeout: 60
-      runas: root
+    - location: scripts/simple_test.sh
+      timeout: 300

@@ -3,10 +3,9 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo "Creating direct deployment package..."
-      - zip -r deployment.zip appspec.yml scripts/ wp-content/themes/
+      - echo "Creating simple test deployment..."
+      - zip deployment.zip appspec.yml
 
 artifacts:
   files:
     - deployment.zip
-  discard-paths: yes
