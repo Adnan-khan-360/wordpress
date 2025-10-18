@@ -3,7 +3,6 @@ os: linux
 files:
   - source: wp-content/themes/
     destination: /var/www/html/wordpress/wp-content/themes/
-    overwrite: yes
 
 permissions:
   - object: /var/www/html/wordpress/wp-content/themes
@@ -20,7 +19,7 @@ hooks:
       runas: root
 
   BeforeInstall:
-    - location: scripts/backup_themes.sh
+    - location: scripts/clean_themes.sh
       timeout: 60
       runas: root
 

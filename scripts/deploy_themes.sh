@@ -1,11 +1,21 @@
 #!/bin/bash
-set -e
-cd /tmp/deploy
+echo "=== Deploying Themes ==="
+THEMES_DIR="/var/www/html/wordpress/wp-content/themes"
 
-echo "Extracting new themes..."
-unzip -o themes.zip -d /
+echo "Checking deployed themes..."
+if [ -d "$THEMES_DIR" ]; then
+    echo "Current themes directory contents:"
+    ls -la "$THEMES_DIR"
+    
+    if [ "$(ls -A $THEMES_DIR)" ]; then
+        echo "Themes deployed successfully:"
+        find "$THEMES_DIR" -type f -name "*.php" -o -name "style.css" | head -10
+    else
+        echo "Themes directory is empty - deployment may have failed"
+    fi
+else
+    echo "ERROR: Themes directory not found!"
+    exit 1
+fi
 
-chown -R www-data:www-data /var/www/html/wordpress/wp-content/themes
-chmod -R 755 /var/www/html/wordpress/wp-content/themes
-
-echo "New themes deployed successfully."
+echo "Theme deployment verification completed"
