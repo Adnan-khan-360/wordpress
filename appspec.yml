@@ -3,6 +3,7 @@ os: linux
 files:
   - source: wp-content/themes/
     destination: /var/www/html/wordpress/wp-content/themes/
+    overwrite: true
 
 permissions:
   - object: /var/www/html/wordpress/wp-content/themes
