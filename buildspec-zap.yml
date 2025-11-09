@@ -18,24 +18,32 @@ phases:
   build:
     commands:
       - echo "Running OWASP ZAP baseline scan on $TARGET_URL ..."
-      #  FIX: Ensure writable workspace
       - chmod -R 777 $(pwd)
-      - docker run --rm -v $(pwd):/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+      - |
+        docker run --rm -v $(pwd):/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
           -t "$TARGET_URL" -r zap_report.html -J zap_report.json || true
-
-      # Optional: Check for high-risk issues
       - echo "Checking for high-risk alerts..."
-      - if [ -f zap_report.json ]; then \
-            HIGH=$(jq '.site[].alerts[] | select(.riskcode == "3") | .name' zap_report.json | wc -l); \
-            if [ "$HIGH" -gt 0 ]; then echo "High risk vulnerabilities found: $HIGH"; else echo " No high-risk issues found."; fi; \
-        else echo " No zap_report.json found."; fi
+      - |
+        if [ -f zap_report.json ]; then
+          HIGH=$(jq '.site[].alerts[] | select(.riskcode == "3") | .name' zap_report.json | wc -l)
+          if [ "$HIGH" -gt 0 ]; then
+            echo "⚠️ High risk vulnerabilities found: $HIGH"
+          else
+            echo "✅ No high-risk issues found."
+          fi
+        else
+          echo "⚠️ No zap_report.json found."
+        fi
 
   post_build:
     commands:
       - echo "Uploading ZAP HTML report to S3..."
-      - if [ -f zap_report.html ]; then \
-            aws s3 cp zap_report.html s3://$S3_BUCKET/reports/zap_report_$(date +%F_%H-%M-%S).html; \
-        else echo "No zap_report.html found to upload."; fi
+      - |
+        if [ -f zap_report.html ]; then
+          aws s3 cp zap_report.html s3://$S3_BUCKET/reports/zap_report_$(date +%F_%H-%M-%S).html
+        else
+          echo "⚠️ No zap_report.html found to upload."
+        fi
       - echo "ZAP scan completed successfully."
 
 artifacts:
