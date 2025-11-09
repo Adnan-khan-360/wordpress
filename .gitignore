@@ -1,0 +1,6 @@
+# Ignore everything by default
+
+# Allow the themes directory structure
+!/wp-content/
+/wp-content/*
+!/wp-content/themes/

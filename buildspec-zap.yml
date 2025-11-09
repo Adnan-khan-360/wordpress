@@ -1,0 +1,37 @@
+version: 0.2
+
+env:
+  variables:
+    TARGET_URL: "http://54.66.44.17/wordpress"  # 👈 Replace with your actual target URL
+    REPORT_NAME: "zap_report_$(date +%F_%H-%M-%S).html"
+    S3_BUCKET: "zap-report-scan"  # 👈 Replace with your S3 bucket name
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies..."
+      - apt-get update -y
+      - apt-get install -y jq docker
+      - echo "Pulling OWASP ZAP Docker image...."
+      - docker pull owasp/zap2docker-stable
+
+  build:
+    commands:
+      - echo "Running OWASP ZAP baseline scan on $TARGET_URL ..."
+      - docker run -v $(pwd):/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py \
+          -t $TARGET_URL -r zap_report.html -J zap_report.json || true
+
+      # Optional: Fail the build if HIGH risk alerts found
+      - echo "Checking for high-risk alerts...."
+      - HIGH=$(jq '.site[].alerts[] | select(.riskcode == "3") | .name' zap_report.json | wc -l)
+      - if [ "$HIGH" -gt 0 ]; then echo "High risk vulnerabilities found: $HIGH"; else echo "No high-risk issues found."; fi
+
+  post_build:
+    commands:
+      - echo "Uploading ZAP HTML report to S3..."
+      - aws s3 cp zap_report.html s3://$S3_BUCKET/reports/$REPORT_NAME
+      - echo "ZAP scan completed successfully."
+
+artifacts:
+  files:
+    - zap_report.html
