@@ -2,9 +2,9 @@ version: 0.2
 
 env:
   variables:
-    TARGET_URL: "http://54.66.44.17/wordpress"  # 👈 Replace with your actual target URL
+    TARGET_URL: "http://54.66.44.17/wordpress"
     REPORT_NAME: "zap_report_$(date +%F_%H-%M-%S).html"
-    S3_BUCKET: "zap-report-scan"  # 👈 Replace with your S3 bucket name
+    S3_BUCKET: "zap-report-scan"
 
 phases:
   install:
@@ -18,13 +18,17 @@ phases:
   build:
     commands:
       - echo "Running OWASP ZAP baseline scan on $TARGET_URL ..."
-      - docker run -v $(pwd):/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py \
-          -t $TARGET_URL -r zap_report.html -J zap_report.json || true
-
-      # Optional: Fail the build if HIGH risk alerts found
+      - |
+        docker run -v $(pwd):/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py \
+          -t "$TARGET_URL" -r zap_report.html -J zap_report.json || true
       - echo "Checking for high-risk alerts...."
-      - HIGH=$(jq '.site[].alerts[] | select(.riskcode == "3") | .name' zap_report.json | wc -l)
-      - if [ "$HIGH" -gt 0 ]; then echo "High risk vulnerabilities found: $HIGH"; else echo "No high-risk issues found."; fi
+      - |
+        HIGH=$(jq '.site[].alerts[] | select(.riskcode == "3") | .name' zap_report.json | wc -l)
+        if [ "$HIGH" -gt 0 ]; then
+          echo "High risk vulnerabilities found: $HIGH"
+        else
+          echo "No high-risk issues found."
+        fi
 
   post_build:
     commands:
