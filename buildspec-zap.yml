@@ -13,13 +13,13 @@ phases:
       - apt-get update -y
       - apt-get install -y jq docker
       - echo "Pulling OWASP ZAP Docker image...."
-      - docker pull owasp/zap2docker-stable
+      - docker pull ghcr.io/zaproxy/zaproxy:stable
 
   build:
     commands:
       - echo "Running OWASP ZAP baseline scan on $TARGET_URL ..."
       - |
-        docker run -v $(pwd):/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py \
+        docker run -v $(pwd):/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
           -t "$TARGET_URL" -r zap_report.html -J zap_report.json || true
       - echo "Checking for high-risk alerts...."
       - |
